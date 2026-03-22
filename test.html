@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAKE UP CHALLENGE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sunrise-orange: #FF6B35;
+            --sunrise-yellow: #FFD23F;
+            --deep-purple: #2D1B69;
+            --night-black: #0A0A0A;
+            --electric-blue: #00D9FF;
+            --success-green: #00FF88;
+            --error-red: #FF3366;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, var(--deep-purple) 0%, var(--night-black) 100%);
+            color: var(--sunrise-yellow);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            color: var(--sunrise-orange);
+            text-align: center;
+            letter-spacing: 0.05em;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+            line-height: 0.9;
+        }
+
+        h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            color: var(--sunrise-yellow);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.03em;
+        }
+
+        .setup-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid var(--sunrise-orange);
+            padding: 3rem 2rem;
+            border-radius: 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                        inset 0 0 0 1px rgba(255, 107, 53, 0.2);
+        }
+
+        .info-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: rgba(255, 210, 63, 0.9);
+        }
+
+        .btn {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            padding: 1.2rem 3rem;
+            background: var(--sunrise-orange);
+            color: var(--night-black);
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--sunrise-yellow);
+            transition: left 0.3s ease;
+        }
+
+        .btn:hover::before {
+            left: 0;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .question-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 5px solid var(--electric-blue);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .question-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            color: var(--sunrise-yellow);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 1.2rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--sunrise-orange);
+            color: var(--sunrise-yellow);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--electric-blue);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .feedback {
+            padding: 1rem;
+            margin-top: 1rem;
+            font-weight: bold;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .feedback.success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .feedback.error {
+            background: rgba(255, 51, 102, 0.2);
+            border: 2px solid var(--error-red);
+            color: var(--error-red);
+        }
+
+        .quote-box {
+            background: linear-gradient(135deg, var(--sunrise-orange), var(--sunrise-yellow));
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-box::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            font-size: 10rem;
+            font-family: 'Bebas Neue', sans-serif;
+            color: rgba(0, 0, 0, 0.1);
+        }
+
+        .quote-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--night-black);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 0.8rem 1.5rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--sunrise-orange);
+            font-size: 0.9rem;
+            color: var(--sunrise-yellow);
+            z-index: 1000;
+        }
+
+        .alarm-time {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 2px solid var(--electric-blue);
+        }
+
+        .alarm-time-big {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: var(--electric-blue);
+            text-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sunrise-orange), var(--sunrise-yellow));
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 600px) {
+            .setup-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">READY TO SET UP</div>
+    
+    <div class="container">
+        <!-- Setup Screen -->
+        <div class="screen active" id="setupScreen">
+            <h1>WAKE UP<br>CHALLENGE</h1>
+            <div class="setup-card">
+                <h2>Morning Brain Activation System</h2>
+                <p class="info-text">
+                    This system will alert you at <strong>6:00 AM</strong> every day and challenge you with three brain-activating tasks:
+                </p>
+                <ul class="info-text" style="list-style-position: inside; margin-left: 1rem;">
+                    <li>Awareness check</li>
+                    <li>Perfect transcription challenge</li>
+                    <li>Mental math problem</li>
+                </ul>
+                <p class="info-text" style="margin-top: 1.5rem;">
+                    <strong>Enable notifications to begin.</strong>
+                </p>
+                <button class="btn" id="enableBtn" onclick="requestNotificationPermission()">
+                    <span>ACTIVATE ALARM</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Waiting Screen -->
+        <div class="screen" id="waitingScreen">
+            <h1>ALARM<br>ARMED</h1>
+            <div class="setup-card">
+                <div class="alarm-time">
+                    <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">NEXT WAKE-UP CALL</div>
+                    <div class="alarm-time-big">06:00 AM</div>
+                </div>
+                <p class="info-text" style="text-align: center;">
+                    Your morning challenge is scheduled.<br>
+                    See you at sunrise. 🌅
+                </p>
+                <button class="btn" onclick="startChallenge()" style="margin-top: 2rem; background: var(--electric-blue);">
+                    <span>TEST CHALLENGE NOW</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Challenge Screen -->
+        <div class="screen" id="challengeScreen">
+            <h1>WAKE UP<br>NOW!</h1>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="question-box" id="q1Box">
+                <div class="question-number">QUESTION 1/3</div>
+                <div class="question-text">Are you awake?</div>
+                <input type="text" id="q1Input" placeholder="Type your answer...">
+                <button class="btn" onclick="checkQ1()"><span>SUBMIT</span></button>
+                <div id="q1Feedback"></div>
+            </div>
+
+            <!-- Question 2 (initially hidden) -->
+            <div class="question-box" id="q2Box" style="display: none;">
+                <div class="question-number">QUESTION 2/3</div>
+                <div class="question-text">Type this sentence EXACTLY, letter by letter:</div>
+                <div id="sentenceToType" style="background: rgba(0, 217, 255, 0.1); padding: 1.5rem; margin: 1rem 0; border-left: 3px solid var(--electric-blue); font-size: 1.1rem; color: white;"></div>
+                <input type="text" id="q2Input" placeholder="Type the sentence exactly...">
+                <button class="btn" onclick="checkQ2()"><span>SUBMIT</span></button>
+                <div id="q2Feedback"></div>
+            </div>
+
+            <!-- Question 3 (initially hidden) -->
+            <div class="question-box" id="q3Box" style="display: none;">
+                <div class="question-number">QUESTION 3/3</div>
+                <div class="question-text">Solve this math problem:</div>
+                <div id="mathProblem" style="font-size: 2rem; color: var(--electric-blue); margin: 1.5rem 0; text-align: center;"></div>
+                <input type="number" id="q3Input" placeholder="Enter your answer...">
+                <button class="btn" onclick="checkQ3()"><span>SUBMIT</span></button>
+                <div id="q3Feedback"></div>
+            </div>
+        </div>
+
+        <!-- Success Screen -->
+        <div class="screen" id="successScreen">
+            <h1>YOU'RE<br>AWAKE!</h1>
+            <div class="quote-box">
+                <div class="quote-text" id="motivationalQuote"></div>
+            </div>
+            <div class="setup-card">
+                <p class="info-text" style="text-align: center; font-size: 1.3rem;">
+                    Challenges completed. Your day starts NOW.
+                </p>
+                <button class="btn" onclick="resetChallenge()" style="background: var(--success-green);">
+                    <span>READY FOR TOMORROW</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let targetSentence = '';
+        let mathAnswer = 0;
+
+        const motivationalQuotes = [
+            "The early morning has gold in its mouth.",
+            "Wake up with determination. Go to bed with satisfaction.",
+            "Every morning is a chance at a new day. Own it.",
+            "The sun has not caught me in bed in fifty years.",
+            "Early to bed and early to rise makes a person healthy, wealthy, and wise.",
+            "I never knew a person who was successful who didn't get up early.",
+            "Lose an hour in the morning, chase it all day.",
+            "Morning is an important time of day because how you spend your morning can often tell you what kind of day you are going to have.",
+            "The breeze at dawn has secrets to tell you. Don't go back to sleep.",
+            "Each morning we are born again. What we do today matters most."
+        ];
+
+        const typingSentences = [
+            "The quick brown fox jumps over the lazy dog while the sun rises magnificently.",
+            "Success comes to those who wake early and seize the day with unwavering determination.",
+            "Morning discipline creates the foundation for extraordinary achievements throughout the day.",
+            "Every sunrise brings new opportunities for those brave enough to wake up and claim them.",
+            "The difference between ordinary and extraordinary is that little extra effort in the morning."
+        ];
+
+        function requestNotificationPermission() {
+            if (!("Notification" in window)) {
+                alert("This browser does not support notifications");
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    updateStatus("ALARM ACTIVE");
+                    scheduleDaily6AMAlarm();
+                    showScreen('waitingScreen');
+                } else {
+                    alert("Notifications blocked. Please enable them in your browser settings.");
+                }
+            });
+        }
+
+        function scheduleDaily6AMAlarm() {
+            // Calculate time until next 6 AM
+            const now = new Date();
+            const next6AM = new Date();
+            next6AM.setHours(6, 0, 0, 0);
+            
+            // If it's already past 6 AM today, schedule for tomorrow
+            if (now.getHours() >= 6) {
+                next6AM.setDate(next6AM.getDate() + 1);
+            }
+
+            const timeUntilAlarm = next6AM - now;
+
+            // Schedule the alarm
+            setTimeout(() => {
+                triggerAlarm();
+                // Schedule the next day
+                setInterval(triggerAlarm, 24 * 60 * 60 * 1000); // Every 24 hours
+            }, timeUntilAlarm);
+
+            console.log(`Alarm scheduled for: ${next6AM.toLocaleString()}`);
+        }
+
+        function triggerAlarm() {
+            // Send notification
+            new Notification("⏰ WAKE UP CHALLENGE!", {
+                body: "Time to prove you're awake! Complete your challenges now.",
+                icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23FF6B35'/></svg>",
+                requireInteraction: true,
+                tag: 'wake-up-alarm'
+            });
+
+            // Play sound (optional - create a beep)
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+
+            // Start challenge
+            startChallenge();
+        }
+
+        function startChallenge() {
+            currentQuestion = 0;
+            showScreen('challengeScreen');
+            updateStatus("CHALLENGE ACTIVE");
+            updateProgress(0);
+            
+            // Reset questions
+            document.getElementById('q1Box').style.display = 'block';
+            document.getElementById('q2Box').style.display = 'none';
+            document.getElementById('q3Box').style.display = 'none';
+            
+            // Clear inputs
+            document.getElementById('q1Input').value = '';
+            document.getElementById('q2Input').value = '';
+            document.getElementById('q3Input').value = '';
+            
+            // Clear feedback
+            document.getElementById('q1Feedback').innerHTML = '';
+            document.getElementById('q2Feedback').innerHTML = '';
+            document.getElementById('q3Feedback').innerHTML = '';
+            
+            // Generate Q2 sentence
+            targetSentence = typingSentences[Math.floor(Math.random() * typingSentences.length)];
+            document.getElementById('sentenceToType').textContent = targetSentence;
+            
+            // Generate Q3 math problem
+            generateMathProblem();
+        }
+
+        function generateMathProblem() {
+            const operations = [
+                () => {
+                    const a = Math.floor(Math.random() * 50) + 10;
+                    const b = Math.floor(Math.random() * 50) + 10;
+                    mathAnswer = a + b;
+                    return `${a} + ${b} = ?`;
+                },
+                () => {
+                    const a = Math.floor(Math.random() * 50) + 50;
+                    const b = Math.floor(Math.random() * 30) + 10;
+                    mathAnswer = a - b;
+                    return `${a} - ${b} = ?`;
+                },
+                () => {
+                    const a = Math.floor(Math.random() * 12) + 2;
+                    const b = Math.floor(Math.random() * 12) + 2;
+                    mathAnswer = a * b;
+                    return `${a} × ${b} = ?`;
+                }
+            ];
+            
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            document.getElementById('mathProblem').textContent = operation();
+        }
+
+        function checkQ1() {
+            const answer = document.getElementById('q1Input').value.trim().toLowerCase();
+            const feedback = document.getElementById('q1Feedback');
+            
+            if (answer.includes('yes') || answer.includes('awake') || answer.includes('yeah') || answer.includes('yep')) {
+                feedback.className = 'feedback success';
+                feedback.textContent = '✓ CORRECT! Moving to next challenge...';
+                updateProgress(33);
+                
+                setTimeout(() => {
+                    document.getElementById('q1Box').style.display = 'none';
+                    document.getElementById('q2Box').style.display = 'block';
+                }, 1500);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.textContent = '✗ Wrong answer. Try again!';
+            }
+        }
+
+        function checkQ2() {
+            const answer = document.getElementById('q2Input').value;
+            const feedback = document.getElementById('q2Feedback');
+            
+            if (answer === targetSentence) {
+                feedback.className = 'feedback success';
+                feedback.textContent = '✓ PERFECT! Every letter matches!';
+                updateProgress(66);
+                
+                setTimeout(() => {
+                    document.getElementById('q2Box').style.display = 'none';
+                    document.getElementById('q3Box').style.display = 'block';
+                }, 1500);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.textContent = '✗ Not exact. Check every character!';
+            }
+        }
+
+        function checkQ3() {
+            const answer = parseInt(document.getElementById('q3Input').value);
+            const feedback = document.getElementById('q3Feedback');
+            
+            if (answer === mathAnswer) {
+                feedback.className = 'feedback success';
+                feedback.textContent = '✓ CORRECT! Challenge completed!';
+                updateProgress(100);
+                
+                setTimeout(() => {
+                    showSuccessScreen();
+                }, 1500);
+            } else {
+                feedback.className = 'feedback error';
+                feedback.textContent = '✗ Wrong answer. Try again!';
+            }
+        }
+
+        function showSuccessScreen() {
+            const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            document.getElementById('motivationalQuote').textContent = quote;
+            showScreen('successScreen');
+            updateStatus("CHALLENGES COMPLETE");
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function updateStatus(text) {
+            document.getElementById('statusIndicator').textContent = text;
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function resetChallenge() {
+            showScreen('waitingScreen');
+            updateStatus("ALARM ACTIVE");
+        }
+
+        // Check if notifications are already granted on load
+        if ("Notification" in window && Notification.permission === "granted") {
+            scheduleDaily6AMAlarm();
+        }
+    </script>
+</body>
+</html>
