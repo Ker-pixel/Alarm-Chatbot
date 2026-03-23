@@ -7,7 +7,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>WAKE UP CHALLENGE</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" href="./icon.svg">
     <style>
         :root {
             --sunrise-orange: #FF6B35;
@@ -311,6 +310,105 @@
             margin: 1rem 0;
         }
 
+        /* STREAK SYSTEM STYLES */
+        .streak-container {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 210, 63, 0.2));
+            border: 3px solid var(--sunrise-orange);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .streak-container::before {
+            content: '🔥';
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .streak-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 5rem;
+            color: var(--sunrise-orange);
+            line-height: 1;
+            margin: 0.5rem 0;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        .streak-label {
+            font-size: 1.2rem;
+            color: var(--sunrise-yellow);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border: 2px solid var(--electric-blue);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            color: var(--electric-blue);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: rgba(255, 210, 63, 0.8);
+            text-transform: uppercase;
+        }
+
+        .milestone-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--success-green);
+            color: var(--night-black);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .streak-mini {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 107, 53, 0.2);
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--sunrise-orange);
+            margin: 1rem 0;
+        }
+
+        .streak-mini-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: var(--sunrise-orange);
+        }
+
         @media (max-width: 600px) {
             .setup-card {
                 padding: 1.5rem 1rem;
@@ -328,6 +426,14 @@
                 font-size: 1.3rem;
                 padding: 1rem 1.5rem;
             }
+
+            .streak-number {
+                font-size: 4rem;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -338,6 +444,14 @@
         <!-- Setup Screen -->
         <div class="screen active" id="setupScreen">
             <h1>WAKE UP<br>CHALLENGE</h1>
+            
+            <!-- Current Streak Display -->
+            <div class="streak-mini" id="currentStreakDisplay" style="display: none; justify-content: center;">
+                <span>🔥</span>
+                <span class="streak-mini-number" id="miniStreakNumber">0</span>
+                <span style="font-size: 0.9rem;">DAY STREAK</span>
+            </div>
+
             <div class="setup-card">
                 <h2>Mobile Morning System</h2>
                 <p class="info-text">
@@ -362,6 +476,18 @@
                 <button class="btn" onclick="startChallenge()" style="margin-top: 1.5rem;">
                     <span>START CHALLENGE NOW</span>
                 </button>
+
+                <!-- Stats Preview -->
+                <div class="stats-grid" id="statsPreview" style="display: none; margin-top: 2rem;">
+                    <div class="stat-box">
+                        <div class="stat-value" id="previewBestStreak">0</div>
+                        <div class="stat-label">Best Streak</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="previewTotalDays">0</div>
+                        <div class="stat-label">Total Days</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -406,13 +532,37 @@
         <!-- Success Screen -->
         <div class="screen" id="successScreen">
             <h1>YOU'RE<br>AWAKE!</h1>
-            <div class="emoji">🌅</div>
+            
+            <!-- Streak Display -->
+            <div class="streak-container">
+                <div class="streak-label">CURRENT STREAK</div>
+                <div class="streak-number" id="streakDisplay">0</div>
+                <div class="streak-label">DAYS 🔥</div>
+            </div>
+
+            <!-- Milestone Badge -->
+            <div id="milestoneContainer" style="text-align: center;"></div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="bestStreakDisplay">0</div>
+                    <div class="stat-label">Best Streak</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="totalDaysDisplay">0</div>
+                    <div class="stat-label">Total Days</div>
+                </div>
+            </div>
+
+            <!-- Quote -->
             <div class="quote-box">
                 <div class="quote-text" id="motivationalQuote"></div>
             </div>
+
             <div class="setup-card">
                 <p class="info-text" style="text-align: center; font-size: 1.2rem;">
-                    All challenges completed.<br>Your day starts NOW.
+                    Challenge completed.<br>Your day starts NOW.
                 </p>
                 <button class="btn" onclick="resetToSetup()" style="background: var(--success-green);">
                     <span>DONE</span>
@@ -447,6 +597,103 @@
             "The difference between ordinary and extraordinary is that little extra effort in the morning."
         ];
 
+        // STREAK SYSTEM
+        function getStreakData() {
+            const data = localStorage.getItem('wakeUpStreak');
+            if (!data) {
+                return {
+                    currentStreak: 0,
+                    bestStreak: 0,
+                    totalDays: 0,
+                    lastCompletedDate: null
+                };
+            }
+            return JSON.parse(data);
+        }
+
+        function saveStreakData(data) {
+            localStorage.setItem('wakeUpStreak', JSON.stringify(data));
+        }
+
+        function getTodayDate() {
+            const today = new Date();
+            return today.toISOString().split('T')[0]; // YYYY-MM-DD format
+        }
+
+        function getYesterdayDate() {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            return yesterday.toISOString().split('T')[0];
+        }
+
+        function updateStreakOnCompletion() {
+            const streakData = getStreakData();
+            const today = getTodayDate();
+            const yesterday = getYesterdayDate();
+
+            // Check if already completed today
+            if (streakData.lastCompletedDate === today) {
+                // Already completed today, just return current data
+                return streakData;
+            }
+
+            // Update streak logic
+            if (streakData.lastCompletedDate === yesterday) {
+                // Continued streak
+                streakData.currentStreak += 1;
+            } else if (streakData.lastCompletedDate === null || streakData.currentStreak === 0) {
+                // First time or starting fresh
+                streakData.currentStreak = 1;
+            } else {
+                // Broke the streak, start over
+                streakData.currentStreak = 1;
+            }
+
+            // Update best streak
+            if (streakData.currentStreak > streakData.bestStreak) {
+                streakData.bestStreak = streakData.currentStreak;
+            }
+
+            // Update total days
+            streakData.totalDays += 1;
+
+            // Update last completed date
+            streakData.lastCompletedDate = today;
+
+            // Save to localStorage
+            saveStreakData(streakData);
+
+            return streakData;
+        }
+
+        function displayStreakStats() {
+            const streakData = getStreakData();
+            
+            // Update success screen
+            document.getElementById('streakDisplay').textContent = streakData.currentStreak;
+            document.getElementById('bestStreakDisplay').textContent = streakData.bestStreak;
+            document.getElementById('totalDaysDisplay').textContent = streakData.totalDays;
+
+            // Check for milestones
+            const milestones = [7, 14, 30, 50, 100, 365];
+            const milestone = milestones.find(m => m === streakData.currentStreak);
+            
+            if (milestone) {
+                const container = document.getElementById('milestoneContainer');
+                container.innerHTML = `<div class="milestone-badge">🏆 ${milestone} DAY MILESTONE!</div>`;
+            }
+
+            // Update mini display on setup screen
+            if (streakData.currentStreak > 0) {
+                document.getElementById('currentStreakDisplay').style.display = 'inline-flex';
+                document.getElementById('miniStreakNumber').textContent = streakData.currentStreak;
+                
+                document.getElementById('statsPreview').style.display = 'grid';
+                document.getElementById('previewBestStreak').textContent = streakData.bestStreak;
+                document.getElementById('previewTotalDays').textContent = streakData.totalDays;
+            }
+        }
+
         // Update clock
         function updateClock() {
             const now = new Date();
@@ -458,6 +705,9 @@
         setInterval(updateClock, 1000);
         updateClock();
 
+        // Display streak on load
+        displayStreakStats();
+
         // Auto-start challenge if opened during wake-up window (5:45 AM - 7:00 AM)
         function checkAutoStart() {
             const now = new Date();
@@ -466,14 +716,20 @@
             
             // Between 5:45 AM and 7:00 AM
             if ((hour === 5 && minute >= 45) || hour === 6) {
-                // Vibrate if available
-                if (navigator.vibrate) {
-                    navigator.vibrate([200, 100, 200, 100, 200]);
-                }
+                // Check if already completed today
+                const streakData = getStreakData();
+                const today = getTodayDate();
                 
-                setTimeout(() => {
-                    startChallenge();
-                }, 1000);
+                if (streakData.lastCompletedDate !== today) {
+                    // Vibrate if available
+                    if (navigator.vibrate) {
+                        navigator.vibrate([200, 100, 200, 100, 200]);
+                    }
+                    
+                    setTimeout(() => {
+                        startChallenge();
+                    }, 1000);
+                }
             }
         }
 
@@ -613,8 +869,16 @@
         }
 
         function showSuccessScreen() {
+            // Update streak
+            const streakData = updateStreakOnCompletion();
+            
+            // Display stats
+            displayStreakStats();
+
+            // Show quote
             const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
             document.getElementById('motivationalQuote').textContent = quote;
+            
             showScreen('successScreen');
             updateStatus("COMPLETE ✓");
         }
@@ -637,6 +901,7 @@
         function resetToSetup() {
             showScreen('setupScreen');
             updateStatus("READY");
+            displayStreakStats(); // Refresh stats display
         }
     </script>
 </body>
