@@ -2,7 +2,7 @@
 
 **The no-excuses system to wake up early and train your brain first thing in the morning!**
 
-This project is a mobile-friendly web app combined with iPhone Shortcuts automation to help you wake up at 6:00 AM, complete a mini brain challenge, and track your streaks.
+This project is an iOS first web app combined with iPhone Shortcuts automation to help you wake up at 6:00 AM, complete a mini brain challenge, and track your streaks.
 
 ---
 
