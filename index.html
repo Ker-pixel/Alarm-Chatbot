@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>WAKE UP CHALLENGE</title>
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -453,14 +454,14 @@
             </div>
 
             <div class="setup-card">
-                <h2>Mobile Morning System</h2>
+                <h2>NO EXCUSES SYSTEM</h2>
                 <p class="info-text">
                     <strong>📱 How it works on mobile:</strong>
                 </p>
                 <ol class="info-text" style="list-style-position: inside; margin-left: 0.5rem;">
                     <li style="margin-bottom: 0.5rem;">Set your phone's alarm for 6:00 AM</li>
                     <li style="margin-bottom: 0.5rem;">Bookmark this page to your home screen</li>
-                    <li style="margin-bottom: 0.5rem;">When alarm rings, open this page</li>
+                    <li style="margin-bottom: 0.5rem;">When alarm rings, open this page immediately</li>
                     <li style="margin-bottom: 0.5rem;">Complete the 3 brain challenges</li>
                 </ol>
                 
@@ -470,7 +471,7 @@
                 </div>
 
                 <p class="info-text" style="text-align: center; margin-top: 1.5rem;">
-                    Auto-starts if you open between <span class="highlight">5:45-7:00 AM</span>
+                    No excuses. Auto-starts if you open between <span class="highlight">5:45-7:00 AM</span>
                 </p>
                 
                 <button class="btn" onclick="startChallenge()" style="margin-top: 1.5rem;">
@@ -562,7 +563,7 @@
 
             <div class="setup-card">
                 <p class="info-text" style="text-align: center; font-size: 1.2rem;">
-                    Challenge completed.<br>Your day starts NOW.
+                    You showed up.<br>Now dominate the day.
                 </p>
                 <button class="btn" onclick="resetToSetup()" style="background: var(--success-green);">
                     <span>DONE</span>
@@ -706,6 +707,17 @@
         updateClock();
 
         // Display streak on load
+        function checkMissedDay() {
+            const streakData = getStreakData();
+            const yesterday = getYesterdayDate();
+
+            if (streakData.lastCompletedDate !== yesterday && streakData.lastCompletedDate !== null) {
+                streakData.currentStreak = 0;
+                saveStreakData(streakData);
+            }
+        }
+
+        checkMissedDay();
         displayStreakStats();
 
         // Auto-start challenge if opened during wake-up window (5:45 AM - 7:00 AM)
@@ -739,7 +751,7 @@
         function startChallenge() {
             // Vibrate on start
             if (navigator.vibrate) {
-                navigator.vibrate(200);
+                navigator.vibrate([300, 100, 300, 100, 500]);
             }
 
             currentQuestion = 0;
@@ -807,7 +819,7 @@
             
             if (answer.includes('yes') || answer.includes('awake') || answer.includes('yeah') || answer.includes('yep')) {
                 feedback.className = 'feedback success';
-                feedback.textContent = '✓ CORRECT! Moving to next challenge...';
+                feedback.textContent = '✓ GOOD. NO GOING BACK NOW.';
                 updateProgress(33);
                 
                 if (navigator.vibrate) navigator.vibrate(100);
@@ -819,7 +831,7 @@
                 }, 1500);
             } else {
                 feedback.className = 'feedback error';
-                feedback.textContent = '✗ Wrong answer. Try again!';
+                feedback.textContent = '✗ WEAK. TRY AGAIN.';
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             }
         }
@@ -830,7 +842,7 @@
             
             if (answer === targetSentence) {
                 feedback.className = 'feedback success';
-                feedback.textContent = '✓ PERFECT! Every letter matches!';
+                feedback.textContent = '✓ SHARP. KEEP PUSHING.';
                 updateProgress(66);
                 
                 if (navigator.vibrate) navigator.vibrate(100);
@@ -842,7 +854,7 @@
                 }, 1500);
             } else {
                 feedback.className = 'feedback error';
-                feedback.textContent = '✗ Not exact. Check every character!';
+                feedback.textContent = '✗ SLOPPY. FOCUS.';
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             }
         }
@@ -853,7 +865,7 @@
             
             if (answer === mathAnswer) {
                 feedback.className = 'feedback success';
-                feedback.textContent = '✓ CORRECT! Challenge completed!';
+                feedback.textContent = '✓ DONE. YOU EARNED THIS MORNING.';
                 updateProgress(100);
                 
                 if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -863,7 +875,7 @@
                 }, 1500);
             } else {
                 feedback.className = 'feedback error';
-                feedback.textContent = '✗ Wrong answer. Try again!';
+                feedback.textContent = '✗ NOT GOOD ENOUGH. AGAIN.';
                 if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             }
         }
@@ -903,6 +915,11 @@
             updateStatus("READY");
             displayStreakStats(); // Refresh stats display
         }
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                alert("NO ESCAPE. GET BACK HERE.");
+            }
+        });
     </script>
 </body>
 </html>
